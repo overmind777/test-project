@@ -1,8 +1,10 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import storage from 'redux-persist/lib/storage';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { filterReducer } from './FliterSlice/filterSlice';
+import { modalReducer } from './ModalSlice/modalSlice';
+import { favoriteCarsPersistReducer } from './Favorite/favoriteSlice';
+
 import {
   persistStore,
-  persistReducer,
   FLUSH,
   REHYDRATE,
   PAUSE,
@@ -11,32 +13,20 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import { contactsReducer } from './sliceContact';
-import { findReduser } from './sliceFind';
-
-const persistConfig = {
-  key: 'root',
-  storage,
-  blacklist: ['find'],
-};
-
-const persistedReducer = persistReducer(
-  persistConfig,
-  combineReducers({
-    contacts: contactsReducer,
-    find: findReduser,
-  })
-);
+const rootReducers = combineReducers({
+  favorite: favoriteCarsPersistReducer,
+  modal: modalReducer,
+  filter: filterReducer,
+});
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducers,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production',
 });
 
 export const persistor = persistStore(store);
